@@ -41,22 +41,18 @@ def run_simulation(true_means, c, time_horizon, n_trials):
 
     return regrets / n_trials
 
-# Parameters
 true_means = [0.1, 0.5, 0.6, 0.7, 0.9]
 time_horizon = 5000
 n_trials = 100
 
-# Add sqrt(2) to the range of c values
 c_values = sorted(set(np.round(np.linspace(0, 3.0, 20), 4).tolist() + [np.sqrt(2)]))
 
-# Run simulations
 results = {}
 for c in c_values:
     avg_regret = run_simulation(true_means, c, time_horizon, n_trials)
     results[c] = avg_regret[-1]
     print(f"c = {c:.4f}, Final Avg Regret = {avg_regret[-1]:.3f}")
 
-# Plot
 best_c = min(results, key=results.get)
 plt.figure(figsize=(8, 5))
 plt.plot(list(results.keys()), list(results.values()), marker='o')

@@ -110,17 +110,17 @@ def main():
     print("=== Match: MCTS(c=1.4142135623730951) vs MCTS(c=2) ===")
     agent1 = MCTSAgent(c=np.sqrt(2))
     agent2 = MCTSAgent(c=2)
-    run_many(agent1, agent2, num_games=4, verbose=True, size=7)
+    run_many(agent1, agent2, num_games=4, verbose=True, size=19)
     
-    print("=== Match: MCTS(c=1.4142135623730951) vs MCTS(c=1) ===")
-    agent1 = MCTSAgent(c=np.sqrt(2))
-    agent2 = MCTSAgent(c=1)
-    run_many(agent1, agent2, num_games=4, verbose=True, size=7)
+    # print("=== Match: MCTS(c=1.4142135623730951) vs MCTS(c=1) ===")
+    # agent1 = MCTSAgent(c=np.sqrt(2))
+    # agent2 = MCTSAgent(c=1)
+    # run_many(agent1, agent2, num_games=4, verbose=True, size=7)
     
-    print("=== Match: MCTS(c=1.4142135623730951) vs MCTS(c=0.5) ===")
-    agent1 = MCTSAgent(c=np.sqrt(2))
-    agent2 = MCTSAgent(c=0.5)
-    run_many(agent1, agent2, num_games=4, verbose=True, size=7)
+    # print("=== Match: MCTS(c=1.4142135623730951) vs MCTS(c=0.5) ===")
+    # agent1 = MCTSAgent(c=np.sqrt(2))
+    # agent2 = MCTSAgent(c=0.5)
+    # run_many(agent1, agent2, num_games=4, verbose=True, size=7)
 
 if __name__ == "__main__":
     main()

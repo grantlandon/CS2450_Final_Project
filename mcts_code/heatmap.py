@@ -1,51 +1,61 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 from mcts import MCTSAgent
 from game_runner import run_many
 import tqdm
 
+os.makedirs("mcts_plots", exist_ok=True)
+
 c_values = [0, 0.5, 1, np.sqrt(2), 2]
-agents = [MCTSAgent(c=c) for c in c_values]
 agent_names = [f"MCTS(c={c})" for c in c_values]
 
-num_agents = len(agents)
-results_matrix = np.zeros((num_agents, num_agents), dtype=int)
+def run_tournament(board_size, num_games=10):
+    num_agents = len(c_values)
+    results_matrix = np.zeros((num_agents, num_agents), dtype=int)
 
-for i in tqdm.tqdm(range(num_agents)):
-    for j in range(i + 1, num_agents):
-        print(f"\n=== Match: {agent_names[i]} vs {agent_names[j]} ===")
-        score_i, score_j = run_many(agents[i], agents[j], num_games=50, verbose=True, size=5)
-        results_matrix[i][j] = score_i
-        results_matrix[j][i] = score_j
+    agents = [MCTSAgent(c=c) for c in c_values]
 
-print("\n=== Tournament Results Matrix ===")
-print(f"{'':20}", end="")
-for name in agent_names:
-    print(f"{name:>15}", end="")
-print()
-for i in range(num_agents):
-    print(f"{agent_names[i]:20}", end="")
-    for j in range(num_agents):
-        if i == j:
-            print(f"{'--':>15}", end="")
-        else:
-            print(f"{results_matrix[i][j]:>15}", end="")
-    print()
+    for i in tqdm.tqdm(range(num_agents)):
+        for j in range(i + 1, num_agents):
+            agent_i = agents[i]
+            agent_j = agents[j]
+            print(f"\n=== Match: {agent_names[i]} vs {agent_names[j]} on {board_size}x{board_size} board ===")
+            agent_i_score, agent_j_score = run_many(agent_i, agent_j, num_games=num_games, verbose=False, size=board_size)
+            results_matrix[i, j] = agent_i_score
+            results_matrix[j, i] = agent_j_score
 
-plt.figure(figsize=(10, 8))
-plt.imshow(results_matrix, cmap='coolwarm', interpolation='nearest')
-plt.colorbar(label='Agent i score vs Agent j')
-plt.xticks(ticks=np.arange(num_agents), labels=agent_names, rotation=45, ha='right')
-plt.yticks(ticks=np.arange(num_agents), labels=agent_names)
-plt.title("MCTS Tournament Results Heatmap")
-plt.xlabel("Opponent Agent (j)")
-plt.ylabel("Evaluated Agent (i)")
+    return results_matrix
 
-for i in range(num_agents):
-    for j in range(num_agents):
-        if i != j:
-            plt.text(j, i, str(results_matrix[i, j]),
-                     ha='center', va='center', color='black', fontsize=10)
+def plot_results(matrix, filename, title):
+    fig, ax = plt.subplots(figsize=(6,6))
+    im = ax.imshow(matrix, cmap="Blues")
 
-plt.tight_layout()
-plt.show()
+    ax.set_xticks(np.arange(len(c_values)))
+    ax.set_yticks(np.arange(len(c_values)))
+    ax.set_xticklabels(c_values)
+    ax.set_yticklabels(c_values)
+
+    plt.setp(ax.get_xticklabels(), rotation=45, ha="right",
+             rotation_mode="anchor")
+
+    for i in range(len(c_values)):
+        for j in range(len(c_values)):
+            text = ax.text(j, i, matrix[i, j],
+                           ha="center", va="center", color="black")
+
+    ax.set_title(title)
+    fig.tight_layout()
+
+    plt.savefig(filename)
+    plt.close()
+
+def main():
+    results_5x5 = run_tournament(board_size=5, num_games=50)
+    plot_results(results_5x5, "mcts_plots/5x5.png", "5x5 Board MCTS Match Results")
+
+    results_19x19 = run_tournament(board_size=19, num_games=50)
+    plot_results(results_19x19, "mcts_plots/19x19.png", "19x19 Board MCTS Match Results")
+
+if __name__ == "__main__":
+    main()
